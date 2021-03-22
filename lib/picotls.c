@@ -5117,8 +5117,12 @@ void ptls_cipher_free(ptls_cipher_context_t *ctx)
 ptls_aead_context_t *new_aead(ptls_aead_algorithm_t *aead, ptls_hash_algorithm_t *hash, int is_enc, const void *secret,
                               ptls_iovec_t hash_value, const char *label_prefix)
 {
+    size_t key_iv_size = aead->key_size + aead->iv_size;
+    uint8_t* key_iv = malloc(key_iv_size);
+    if (!key_iv) {
+        return NULL;
+    }
     ptls_aead_context_t *ctx = NULL;
-    uint8_t key_iv[aead->key_size + aead->iv_size];
     int ret;
 
     if ((ret = get_traffic_key(hash, key_iv, aead->key_size, 0, secret, hash_value, label_prefix)) != 0)
@@ -5128,7 +5132,8 @@ ptls_aead_context_t *new_aead(ptls_aead_algorithm_t *aead, ptls_hash_algorithm_t
     ctx = ptls_aead_new_direct(aead, is_enc, key_iv, key_iv + aead->key_size);
 
 Exit:
-    ptls_clear_memory(key_iv, sizeof(key_iv));
+    ptls_clear_memory(key_iv, key_iv_size);
+    free(key_iv);
     return ctx;
 }
 

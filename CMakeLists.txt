@@ -18,6 +18,7 @@ INCLUDE_DIRECTORIES(
     deps/cifra/src
     deps/micro-ecc
     deps/picotest
+    picotlsvs/picotls
     include
     ${CMAKE_CURRENT_BINARY_DIR})
 SET(MINICRYPTO_LIBRARY_FILES
@@ -96,7 +97,7 @@ SET(TEST_EXES test-minicrypto.t)
 FIND_PACKAGE(OpenSSL)
 IF (OPENSSL_FOUND AND NOT (OPENSSL_VERSION VERSION_LESS "1.0.1"))
     MESSAGE(STATUS "  Enabling OpenSSL support")
-    INCLUDE_DIRECTORIES(${OPENSSL_INCLUDE_DIR})
+    INCLUDE_DIRECTORIES(${OPENSSL_INCLUDE_DIR} ${OPENSSL_ROOT_DIR})
     ADD_LIBRARY(picotls-openssl lib/openssl.c)
     TARGET_LINK_LIBRARIES(picotls-openssl ${OPENSSL_LIBRARIES} picotls-core ${CMAKE_DL_LIBS})
     ADD_EXECUTABLE(cli t/cli.c lib/pembase64.c)
