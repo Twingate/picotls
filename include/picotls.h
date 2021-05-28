@@ -52,7 +52,7 @@ extern "C" {
  * best coverage. This macro is for preventing misuse going into the master branch, having it work one of the compilers supported in
  * our CI is enough.
  */
-#if (defined(__clang__) && __clang_major__ >= 10) || (__GNUC__ >= 6 && !__cplusplus)
+#if ((defined(__clang__) && __clang_major__ >= 10) || __GNUC__ >= 6) && !defined(__cplusplus)
 #define PTLS_ASSERT_IS_ARRAY_EXPR(a) PTLS_BUILD_ASSERT_EXPR(__builtin_types_compatible_p(__typeof__(a[0])[], __typeof__(a)))
 #else
 #define PTLS_ASSERT_IS_ARRAY_EXPR(a) 1
@@ -1359,7 +1359,8 @@ inline void ptls_buffer_init(ptls_buffer_t *buf, void *smallbuf, size_t smallbuf
 inline void ptls_buffer_dispose(ptls_buffer_t *buf)
 {
     ptls_buffer__release_memory(buf);
-    *buf = (ptls_buffer_t){NULL};
+    ptls_buffer_t empty_buffer = {0};
+    *buf = empty_buffer;
 }
 
 inline uint8_t *ptls_encode_quicint(uint8_t *p, uint64_t v)
