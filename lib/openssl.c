@@ -954,7 +954,7 @@ static X509 *to_x509(ptls_iovec_t vec)
     return d2i_X509(NULL, &p, (long)vec.len);
 }
 
-static int verify_sign(void *verify_ctx, ptls_iovec_t data, ptls_iovec_t signature)
+int ptls_verify_sign(void *verify_ctx, ptls_iovec_t data, ptls_iovec_t signature)
 {
     EVP_PKEY *key = verify_ctx;
     EVP_MD_CTX *ctx = NULL;
@@ -1224,7 +1224,7 @@ static int verify_cert(ptls_verify_certificate_t *_self, ptls_t *tls, int (**ver
         ret = PTLS_ALERT_BAD_CERTIFICATE;
         goto Exit;
     }
-    *verifier = verify_sign;
+    *verifier = ptls_verify_sign;
 
 Exit:
     if (chain != NULL)

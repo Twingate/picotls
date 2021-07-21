@@ -112,6 +112,7 @@ typedef struct st_ptls_openssl_verify_certificate_t {
 int ptls_openssl_init_verify_certificate(ptls_openssl_verify_certificate_t *self, X509_STORE *store);
 void ptls_openssl_dispose_verify_certificate(ptls_openssl_verify_certificate_t *self);
 X509_STORE *ptls_openssl_create_default_certificate_store(void);
+int ptls_verify_sign(void *verify_ctx, ptls_iovec_t data, ptls_iovec_t signature);
 
 int ptls_openssl_encrypt_ticket(ptls_buffer_t *dst, ptls_iovec_t src,
                                 int (*cb)(unsigned char *, unsigned char *, EVP_CIPHER_CTX *, HMAC_CTX *, int));
