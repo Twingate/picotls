@@ -154,21 +154,34 @@ static inline size_t aesgcm_decrypt(ptls_aead_context_t *_ctx, void *output, con
     return tag_offset;
 }
 
+static inline void aesgcm_xor_iv(ptls_aead_context_t *_ctx, const void *_bytes, size_t len)
+{
+    struct aesgcm_context_t *ctx = (struct aesgcm_context_t *)_ctx;
+    const uint8_t *bytes = _bytes;
+
+    for (size_t i = 0; i < len; ++i)
+        ctx->static_iv[i] ^= bytes[i];
+}
+
 static inline int aead_aesgcm_setup_crypto(ptls_aead_context_t *_ctx, int is_enc, const void *key, const void *iv)
 {
     struct aesgcm_context_t *ctx = (struct aesgcm_context_t *)_ctx;
 
     ctx->super.dispose_crypto = aesgcm_dispose_crypto;
+    ctx->super.do_xor_iv = aesgcm_xor_iv;
     if (is_enc) {
         ctx->super.do_encrypt_init = aesgcm_encrypt_init;
         ctx->super.do_encrypt_update = aesgcm_encrypt_update;
         ctx->super.do_encrypt_final = aesgcm_encrypt_final;
         ctx->super.do_encrypt = ptls_aead__do_encrypt;
+        ctx->super.do_encrypt_v = ptls_aead__do_encrypt_v;
         ctx->super.do_decrypt = NULL;
     } else {
         ctx->super.do_encrypt_init = NULL;
         ctx->super.do_encrypt_update = NULL;
         ctx->super.do_encrypt_final = NULL;
+        ctx->super.do_encrypt = NULL;
+        ctx->super.do_encrypt_v = NULL;
         ctx->super.do_decrypt = aesgcm_decrypt;
     }
 
