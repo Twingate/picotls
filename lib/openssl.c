@@ -962,6 +962,9 @@ static int evp_kem_exchange(ptls_key_exchange_algorithm_t *algo, ptls_iovec_t *c
         goto Exit;
     }
 
+    /* the paramgen context is no longer needed; release it before reusing the variable, otherwise it is leaked as `Exit`
+     * only frees whatever `evpctx` points to at that moment */
+    EVP_PKEY_CTX_free(evpctx);
     evpctx = EVP_PKEY_CTX_new_from_pkey(NULL, key, NULL);
     if (evpctx == NULL) {
         ret = PTLS_ERROR_LIBRARY;
